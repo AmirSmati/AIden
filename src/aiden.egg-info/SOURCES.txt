@@ -1,8 +1,0 @@
-README.md
-pyproject.toml
-src/aiden/__init__.py
-src/aiden.egg-info/PKG-INFO
-src/aiden.egg-info/SOURCES.txt
-src/aiden.egg-info/dependency_links.txt
-src/aiden.egg-info/requires.txt
-src/aiden.egg-info/top_level.txt
