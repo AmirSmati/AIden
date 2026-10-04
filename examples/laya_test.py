@@ -1,25 +1,23 @@
-import laya
+import pytest
+
+from aiden.decisions.laya import LayaDecisionProvider
 
 
-def main():
-    agent = laya.load("convaiinnovations/laya")
+@pytest.mark.asyncio
+async def test_laya_decision():
 
-    state = {
-        "task": "The user asks about something they previously told the agent."
-    }
+    decision_provider = LayaDecisionProvider()
 
-    questions = {
-        "memory": {
-            "type": "noul",
-            "instructions": "Should the agent retrieve long-term memory to answer this task?"
-        }
-    }
+    result = await decision_provider.decide(
+        question="Should the agent retrieve long-term memory?",
+        context="The user asks about something they previously told the agent.",
+    )
 
-    result = agent.predict(state, questions)
+    print("\nLaya decision:", result)
 
-    print("Laya result:")
-    print(result)
-
-
-if __name__ == "__main__":
-    main()
+    assert result
+    assert result.type == "noul"
+    assert 0.0 <= result.score <= 1.0
+    assert 0.0 <= result.confidence <= 1.0
+    assert 0.0 <= result.answer_confidence <= 1.0
+    assert 0.0 <= result.act_probability <= 1.0
