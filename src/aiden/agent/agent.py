@@ -1,4 +1,5 @@
 from src.aiden.models.base import ModelProvider
+from src.aiden.agent.state import AgentState
 
 class Agent:
     def __init__(self,model : ModelProvider) :
@@ -8,10 +9,20 @@ class Agent:
         """Simple Run task;
         Will be the ReAct loop in the future
         """
-        messages = [
-            {
-                "role" : "user",
-                "content" :task
-            }
-        ]
-        return await self.model.generate(messages)
+        state = AgentState(task=task)
+
+        state.messages.append({
+            "role" : "user",
+            "content" : task
+        })
+
+        response = await self.model.generate(state.messages)
+
+        state.messages.append({
+                    "role" : "Assistant",
+                    "content" : response
+                })
+
+        state.finished = True
+
+        return response
