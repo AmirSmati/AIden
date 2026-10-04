@@ -1,0 +1,6 @@
+ollama
+pydantic
+
+[dev]
+pytest
+ruff
