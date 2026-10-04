@@ -21,3 +21,4 @@ async def test_laya_decision():
     assert 0.0 <= result.confidence <= 1.0
     assert 0.0 <= result.answer_confidence <= 1.0
     assert 0.0 <= result.act_probability <= 1.0
+    assert result.is_positive is True
