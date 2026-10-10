@@ -6,3 +6,4 @@ class AgentState :
     messages : list[dict[str,str]] = field(default_factory=list)
     step : int = 0
     finished : bool = False
+    current_node: str | None = None

@@ -18,7 +18,9 @@ class Graph:
             raise KeyError(f"Node not found: {name}")
         return self.nodes[name]
 
-    def get_edge(self, source : str)-> list[Edge] :
+    def get_edges(self, source : str | None = None)-> list[Edge] :
+        if not source :
+            return []
         return [
             edge for edge in self.edges
             if edge.source == source
