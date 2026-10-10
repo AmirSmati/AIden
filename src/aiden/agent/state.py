@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import Any
 
 from aiden.agent.action import AgentAction
 
@@ -10,3 +11,4 @@ class AgentState :
     finished : bool = False
     current_node: str | None = None
     action: AgentAction | None = None
+    observation: Any = None
