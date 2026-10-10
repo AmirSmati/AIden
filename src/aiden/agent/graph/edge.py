@@ -5,4 +5,4 @@ from dataclasses import dataclass
 class Edge:
     source: str
     target: str
-    
+    condition: bool | None = None
