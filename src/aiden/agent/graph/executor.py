@@ -1,4 +1,3 @@
-
 from aiden.agent.graph.graph import Graph
 from aiden.agent.state import AgentState
 
@@ -26,7 +25,11 @@ class GraphExecutor:
             if executions >= self.max_steps:
                 raise RuntimeError("Maximum graph steps exceeded.")
 
-            node = self.graph.get_node(state.current_node)
+            current = state.current_node
+            if current is None:
+                raise RuntimeError("No current node specified.")
+
+            node = self.graph.get_node(current)
             state = await node.execute(state)
 
             executions += 1
@@ -35,18 +38,53 @@ class GraphExecutor:
             if state.finished:
                 break
 
-            edges = self.graph.get_edges(state.current_node)
+            next_node = await self._select_next_node(current, state)
 
-            # No outgoing edges: terminal node
-            if not edges:
+            if next_node is None:
                 break
 
-            # Branching will be implemented later
-            if len(edges) > 1:
-                raise NotImplementedError(
-                    "Conditional routing is not implemented yet."
-                )
-
-            state.current_node = edges[0].target
+            state.current_node = next_node
 
         return state
+
+    async def _select_next_node(
+        self,
+        source: str,
+        state: AgentState,
+    ) -> str | None:
+        edges = self.graph.get_edges(source)
+
+        if not edges:
+            return None
+
+        # Follow a single unconditional edge directly.
+        if len(edges) == 1 and edges[0].condition is None:
+            return edges[0].target
+
+        # Conditional and unconditional edges cannot be mixed.
+        if any(edge.condition is None for edge in edges):
+            raise RuntimeError(
+                f"Cannot mix conditional and unconditional edges at '{source}'."
+            )
+
+        gate = self.graph.get_gate(source)
+
+        if gate is None:
+            raise RuntimeError(
+                f"No DecisionGate configured for branching node '{source}'."
+            )
+
+        decision = await gate.evaluate(state)
+
+        matching_edges = [
+            edge for edge in edges
+            if edge.condition is decision
+        ]
+
+        if len(matching_edges) != 1:
+            raise RuntimeError(
+                f"Expected exactly one matching edge at '{source}', "
+                f"found {len(matching_edges)}."
+            )
+
+        return matching_edges[0].target

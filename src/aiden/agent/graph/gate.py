@@ -7,9 +7,9 @@ class DecisionGate:
         self.question = question
         self.dec_provider = dec_provider
 
-    async def evaluate(self, state: AgentState, question : str) -> str :
+    async def evaluate(self, state: AgentState) -> str :
         result = await self.dec_provider.decide(
-            question,   
+            self.question,   
             context=str(state)
         )
         return result.is_positive
