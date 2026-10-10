@@ -2,22 +2,23 @@ import pytest
 
 from aiden.agent.graph.nodes.reason import ReasonNode
 from aiden.agent.state import AgentState
-from aiden.models.base import ModelProvider
-
-
-class FakeModel(ModelProvider):
-
-    async def generate(self, messages, **kwargs) -> str:
-        return "The answer is 100."
+from aiden.models.ollama import OllamaProvider
 
 
 @pytest.mark.asyncio
-async def test_reason_node():
-    node = ReasonNode(model=FakeModel())
-    state = AgentState(task="What is 25 * 4?")
+async def test_qwen_generates_tool_action():
+    model = OllamaProvider(model="qwen3:8b")
+    node = ReasonNode(model=model)
+
+    state = AgentState(
+        task="Calculate 25 multiplied by 4. Use the calculator tool."
+    )
 
     result = await node.execute(state)
 
-    assert result.messages[0]["content"] == "What is 25 * 4?"
-    assert result.messages[-1]["content"] == "The answer is 100."
-    assert node.name == "reason"
+    print("\nGenerated action:", result.action)
+
+    assert result.action is not None
+    assert result.action.type == "tool"
+    assert result.action.tool == "calculator"
+    assert result.action.arguments["expression"]

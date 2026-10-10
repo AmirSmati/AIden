@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 
+from aiden.agent.action import AgentAction
+
 @dataclass
 class AgentState : 
     task : str
@@ -7,3 +9,4 @@ class AgentState :
     step : int = 0
     finished : bool = False
     current_node: str | None = None
+    action: AgentAction | None = None
