@@ -6,3 +6,4 @@ class Edge:
     source: str
     target: str
     condition: bool | None = None
+    route: str | None = None

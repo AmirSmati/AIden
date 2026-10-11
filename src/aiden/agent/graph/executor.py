@@ -57,34 +57,56 @@ class GraphExecutor:
         if not edges:
             return None
 
-        # Follow a single unconditional edge directly.
-        if len(edges) == 1 and edges[0].condition is None:
+        # One unconditional edge.
+        if (
+            len(edges) == 1
+            and edges[0].condition is None
+            and edges[0].route is None
+        ):
             return edges[0].target
 
-        # Conditional and unconditional edges cannot be mixed.
-        if any(edge.condition is None for edge in edges):
+        # Route using Qwen's structured action type.
+        if all(
+            edge.route is not None and edge.condition is None
+            for edge in edges
+        ):
+            if state.action is None:
+                raise RuntimeError(
+                    f"Node '{source}' needs an action to route."
+                )
+
+            matches = [
+                edge for edge in edges
+                if edge.route == state.action.type
+            ]
+
+        # Route using a Boolean DecisionGate, such as Laya.
+        elif all(
+            edge.condition is not None and edge.route is None
+            for edge in edges
+        ):
+            gate = self.graph.get_gate(source)
+
+            if gate is None:
+                raise RuntimeError(
+                    f"No DecisionGate configured for '{source}'."
+                )
+
+            decision = await gate.evaluate(state)
+            matches = [
+                edge for edge in edges
+                if edge.condition is decision
+            ]
+
+        else:
             raise RuntimeError(
-                f"Cannot mix conditional and unconditional edges at '{source}'."
+                f"Invalid or mixed routing configuration at '{source}'."
             )
 
-        gate = self.graph.get_gate(source)
-
-        if gate is None:
-            raise RuntimeError(
-                f"No DecisionGate configured for branching node '{source}'."
-            )
-
-        decision = await gate.evaluate(state)
-
-        matching_edges = [
-            edge for edge in edges
-            if edge.condition is decision
-        ]
-
-        if len(matching_edges) != 1:
+        if len(matches) != 1:
             raise RuntimeError(
                 f"Expected exactly one matching edge at '{source}', "
-                f"found {len(matching_edges)}."
+                f"found {len(matches)}."
             )
 
-        return matching_edges[0].target
+        return matches[0].target

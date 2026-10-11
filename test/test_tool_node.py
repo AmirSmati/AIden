@@ -1,7 +1,7 @@
 import pytest
 
 from aiden.agent.action import AgentAction
-from aiden.agent.graph.nodes.tool import Tool
+from aiden.agent.graph.nodes.tool import ToolNode
 from aiden.agent.state import AgentState
 from aiden.agent.tools.calculator import CalculatorTool
 from aiden.agent.tools.registery import ToolRegistery
@@ -12,7 +12,7 @@ async def test_tool_node_executes_action():
     registry = ToolRegistery()
     registry.register(CalculatorTool())
 
-    node = Tool(tool_registry=registry)
+    node = ToolNode(tool_registry=registry)
 
     state = AgentState(
         task="Calculate 25 * 4",

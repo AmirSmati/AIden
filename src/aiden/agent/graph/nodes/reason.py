@@ -29,6 +29,10 @@ class ReasonNode(Node):
 
             Return only a JSON object matching the requested schema.
             Do not include Markdown fences or additional text.
+            
+            If a tool result is already present in the conversation and answers
+            the task, use that result to produce a final answer instead of
+            repeating the same tool call.
             """
 
         if not any(m["role"] == "system" for m in state.messages):
