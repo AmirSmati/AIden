@@ -2,7 +2,7 @@ from typing import Any
 
 from ollama import AsyncClient
 
-from src.aiden.models.base import ModelProvider
+from aiden.models.base import ModelProvider
 
 class OllamaProvider(ModelProvider):
     def __init__(

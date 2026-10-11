@@ -21,10 +21,10 @@ class ReasonNode(Node):
             - "tool": call an available tool.
             - "final": provide the final answer.
 
-            The available tool is "calculator", which accepts an
+            The available tool is "Calculator", which accepts an
             "expression" argument containing a mathematical expression.
 
-            For calculations, prefer the calculator.
+            For calculations, prefer the Calculator.
             For other tasks you can answer directly, use "final".
 
             Return only a JSON object matching the requested schema.
