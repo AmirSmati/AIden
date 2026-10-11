@@ -3,8 +3,32 @@ import asyncio
 from aiden.agent.agent import Agent
 from aiden.models.ollama import OllamaProvider
 
+import os
+
+from dotenv import load_dotenv
+from aiden.models.groq import GroqProvider
+from aiden.net import has_internet
+load_dotenv()
+
+
+def create_model():
+
+    net=has_internet()
+
+    if net == False:
+        provider = os.getenv("AIDEN_PROVIDER", "ollama").lower()
+        print("Working with on-prem Model : qwen3:8b")
+        return OllamaProvider(model="qwen3:8b")
+
+    if net == True:
+        print(f"Working with {GroqProvider().model}")
+        return GroqProvider()
+
+    raise ValueError(f"Unknown model provider")
+
 
 async def main():
+    model = create_model()
     model = OllamaProvider(model="qwen3:8b")
     agent = Agent(model=model)
 

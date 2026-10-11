@@ -16,6 +16,8 @@ dev = [
     "laya",
     "simpleeval",
     "ruff",
+    "groq",
+    "dotenv"
 ]
 
 [build-system]
