@@ -12,3 +12,4 @@ class AgentState :
     current_node: str | None = None
     action: AgentAction | None = None
     observation: Any = None
+    final_answer: str | None = None
